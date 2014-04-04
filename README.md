@@ -8,8 +8,8 @@ uncertainties.
 Assuming that the error of the time series are 1-sigma deviations of the value,
 generates several fake curves with random points that follow a normal
 distribution with the same 1-sigma deviation. Calculates the cross-correlation
-fuciton and time-delay for each fake curve and find the mean and standard
-deviation of the distributions of time-delays.
+function and time-delay for each fake curve. Find the mean and standard
+deviation of the distribution of time-delays.
 
 **External packages needed:**
   - matplotlib
