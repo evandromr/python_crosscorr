@@ -134,7 +134,7 @@ if __name__ == "__main__":
     excludedx = []
     excludedy = []
     numexx = 0
-    nimexy = 0
+    numexy = 0
     print ''
     print 'Nan and negative values = 0'
     print ''
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         if (y[i] >=0):
             pass
         else:
-            excludedy.append((i,y[y]))
+            excludedy.append((i,y[i]))
             numexy += 1
             y[i]=0
             ye[i] = 0
@@ -315,29 +315,35 @@ if __name__ == "__main__":
          shift = shift + min(t)
 #=============================================== END of BLOCK =================
 
-#   visualize calculated time shift
-    print "        =========================          "
-    print "                 INFO                      "
-    print "        =========================          "
+#   Print Info
+    print ""
+    print ""
+    print "==================================================================="
+    print "                                  INFO                             "
+    print "==================================================================="
     print "Initial Time: {0}".format(tstart)
-    print "Final Time: {0}".format(tend)
+    print "Final Time:   {0}".format(tend)
     print "Total observed time: {0}".format(max(t))
+    print "Temporal bin size: {0}".format(int(t[1]-t[0]))
+    print "Number of bins:    {0}".format(len(x))
     print ''
-    print '{0} negative or NaN values in the first lightcurve'.format(numexx)
-    print 'list of index and values on first lightcurve swaped for zeros'
+    print 'founded {0} negative or NaN values in the first lightcurve'.format(numexx)
+    print 'list of index and values (swaped for zeros)'
     print excludedx
     print ''
     print ''
-    print '{0} negative or NaN values in the second lightcurve'.format(numexy)
-    print 'list of index and values on first lightcurve swaped for zeros'
+    print 'founded {0} negative or NaN values in the second lightcurve'.format(numexy)
+    print 'list of index and values (swaped for zeros)'
     print excludedy
     print ''
     print "Result from the direct cross-correlation function:"
     print "time shift = {0:.2f}".format(corrshift)
     print ''
     print 'Results from the simulated distribution:'
+    print ''
+    print '{0} Simulations'.format(nsimulations)
     print 'time shift = {0:.2f} +- {1:.2f}'.format(shift, sigma)
-    print "============================================ END ================="
+    print "============================= END ================================="
 
 #   open file to write results of the correlation function
     out = open('crosscorr.dat', 'w')
