@@ -128,8 +128,13 @@ if __name__ == "__main__":
     ye = tb2.field(yerr)
 
 #-----------------------------------------------------------------------------
-#   Change NaN and Negative values to zero (as xronos crosscorr task 
-#   see: https://heasarc.gsfc.nasa.gov/docs/xanadu/xronos/help/crosscor.html 
+#   Change NaN and Negative values to zero (as xronos crosscorr task
+#   see: https://heasarc.gsfc.nasa.gov/docs/xanadu/xronos/help/crosscor.html
+
+    excludedx = []
+    excludedy = []
+    numexx = 0
+    nimexy = 0
     print ''
     print 'Nan and negative values = 0'
     print ''
@@ -137,17 +142,23 @@ if __name__ == "__main__":
         if (x[i] >=0):
             pass
         else:
+            excludedx.append((i,x[i]))
+            numexx += 1
             x[i] = 0
             xe[i] = 0
-        
+
         if (y[i] >=0):
             pass
         else:
+            excludedy.append((i,y[y]))
+            numexy += 1
             y[i]=0
             ye[i] = 0
 #------------------------------------------------------------------------------
 
 ##  start time from Zero
+    tstart = min(t)
+    tend = max(t)
     t -= min(t)
 
 ### === MONTE CARLO SIMULATIONS ===============================================
@@ -186,6 +197,15 @@ if __name__ == "__main__":
     plt.show()
     plt.cla()
 
+#   plot all fake points and original curve on top to check
+    for simulated in newxses:
+       plt.plot(t, simulated, '.', alpha=0.6)
+    plt.errorbar(t, x, yerr=xe, fmt='k+-', linewidth=2.0)
+    plt.title("Colored: randomized points, Black: Original lightcurve")
+    plt.savefig('fake_x_lightcurves.ps')
+    plt.show()
+    plt.cla()
+
 #   plot 10 new x lightcurves and original on top to check
     for simulated in newxses[:10]:
        plt.plot(t, simulated, '.-', alpha=0.5)
@@ -196,6 +216,15 @@ if __name__ == "__main__":
     plt.cla()
 
 #   plot new y lightcurves and original on top to check
+    for simulated in newyses:
+        plt.plot(t, simulated, '.', alpha=0.6)
+    plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0)
+    plt.title("Colored: randomized lightcurves, Black: Original lightcurve")
+    plt.savefig('fake_y_lightcurves.ps')
+    plt.show()
+    plt.cla()
+
+#   plot 10 new y lightcurves and original on top to check
     for simulated in newyses[:10]:
         plt.plot(t, simulated, '.-', alpha=0.5)
     plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0, alpha=0.7)
@@ -265,8 +294,10 @@ if __name__ == "__main__":
 #   Calculates correlation of x and y time series
     corr, offset, newt, shift = crosscorr(x, y, t)
 
+    corrshift = shift
+
 # === BEGIN of BLOCK ==========================================================
-# == Comment this block to use results 
+# == Comment this block to use results
 #    free of monte-carlo statistics
 
 #   time shift given by the maximum of the distribution
@@ -285,7 +316,28 @@ if __name__ == "__main__":
 #=============================================== END of BLOCK =================
 
 #   visualize calculated time shift
+    print "        =========================          "
+    print "                 INFO                      "
+    print "        =========================          "
+    print "Initial Time: {0}".format(tstart)
+    print "Final Time: {0}".format(tend)
+    print "Total observed time: {0}".format(max(t))
+    print ''
+    print '{0} negative or NaN values in the first lightcurve'.format(numexx)
+    print 'list of index and values on first lightcurve swaped for zeros'
+    print excludedx
+    print ''
+    print ''
+    print '{0} negative or NaN values in the second lightcurve'.format(numexy)
+    print 'list of index and values on first lightcurve swaped for zeros'
+    print excludedy
+    print ''
+    print "Result from the direct cross-correlation function:"
+    print "time shift = {0:.2f}".format(corrshift)
+    print ''
+    print 'Results from the simulated distribution:'
     print 'time shift = {0:.2f} +- {1:.2f}'.format(shift, sigma)
+    print "============================================ END ================="
 
 #   open file to write results of the correlation function
     out = open('crosscorr.dat', 'w')
@@ -312,6 +364,7 @@ if __name__ == "__main__":
     plt.errorbar(t, y, yerr=ye, label='series 2')
     plt.xlabel('Time [s]', fontsize=12)
     plt.ylabel('Normalized Count Rate [counts/s]', fontsize=12)
+    plt.legend(loc='best')
     plt.savefig('lightcurves.ps')
     plt.show()
     plt.cla()
