@@ -239,9 +239,20 @@ if __name__ == "__main__":
 #   calcule the various correlation functions
 #   and stores the time-shifts to build a distribution
     shiftes = []
+    corrs = []
     for newx, newy in zip(newxses, newyses):
         newcorr, newoffset, nnewt, newshift = crosscorr(newx, newy, t)
         shiftes.append(newshift)
+        corrs.append(newcorr)
+
+#   plot all correlation functions (comment to ignore)
+    for correlations in corrs:
+        plt.plot(newoffset, correlations, alpha=0.6)
+    plt.xlabel('Offset [s]')
+    plt.ylabel('Correlation')
+    plt.savefig('correlations.ps')
+    plt.show()
+    plt.cla()
 
 #   calculates the natural binning of the lightcurve
     stp = abs(t[1] - t[0])
