@@ -240,14 +240,16 @@ if __name__ == "__main__":
 #   and stores the time-shifts to build a distribution
     shiftes = []
     corrs = []
+    offsets = []
     for newx, newy in zip(newxses, newyses):
         newcorr, newoffset, nnewt, newshift = crosscorr(newx, newy, t)
         shiftes.append(newshift)
         corrs.append(newcorr)
+        offsets.append(newoffset)
 
 #   plot all correlation functions (comment to ignore)
-    for correlations in corrs:
-        plt.plot(newoffset, correlations, alpha=0.6)
+    for correlation, offset in zip(corrs, offsets):
+        plt.plot(offset, correlation, alpha=0.6)
     plt.xlabel('Offset [s]')
     plt.ylabel('Correlation')
     plt.savefig('correlations.ps')
