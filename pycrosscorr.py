@@ -1,4 +1,7 @@
 #!/usr/env python
+#
+# Calculate the cross correlation of two time series
+# Estimates the uncertainties using Monte Carlo Simulation
 
 import matplotlib.pyplot as plt  # plot library
 import numpy as np  # array manipulation
@@ -166,7 +169,7 @@ if __name__ == "__main__":
 
 #   for each point in x and y, generates 'nsimulation' new points
 #   new value = (uncertainty*random.values + mean)
-#   the randon files follow a normal distribution with 1-sigma equals the
+#   the randon points follow a normal distribution with 1-sigma equals to the
 #   1-sigma error bars from the original series
 
     aux1 = []
@@ -186,7 +189,7 @@ if __name__ == "__main__":
     for n in xrange(nsimulations):
         newyses.append(np.array([aux2[m][n] for m in xrange(len(aux2))]))
 
-#======= DEBUG OPTIONS, may comment this part =================================
+#======= DEBUG OPTIONS, comment if not necessary ==============================
 #   plot the distribution of a single point to check if it follows a normal
 #   distribution
     plt.hist(aux1[len(t)/2], label='mid point of curve 1', alpha=0.5)
@@ -247,7 +250,7 @@ if __name__ == "__main__":
         corrs.append(newcorr)
         offsets.append(newoffset)
 
-#   plot all correlation functions (comment to ignore)
+### DEBUG OPTION: plot all correlation functions (comment to ignore)
     for correlation, offset in zip(corrs, offsets):
         plt.plot(offset, correlation, alpha=0.6)
     plt.xlabel('Offset [s]')
@@ -338,25 +341,19 @@ if __name__ == "__main__":
     print "Final Time:   {0}".format(tend)
     print "Total observed time: {0}".format(max(t))
     print "Temporal bin size: {0}".format(int(t[1]-t[0]))
-    print "Number of bins:    {0}".format(len(x))
-    print ''
+    print "Number of bins:    {0}\n".format(len(x))
     print 'founded {0} negative or NaN values in the first lightcurve'.format(numexx)
     print 'list of index and values (swaped for zeros)'
     print excludedx
-    print ''
-    print ''
-    print 'founded {0} negative or NaN values in the second lightcurve'.format(numexy)
+    print '\nfounded {0} negative or NaN values in the second lightcurve'.format(numexy)
     print 'list of index and values (swaped for zeros)'
     print excludedy
-    print ''
-    print "Result from the direct cross-correlation function:"
-    print "time shift = {0:.2f}".format(corrshift)
-    print ''
-    print 'Results from the simulated distribution:'
-    print ''
+    print "\nResult from the direct cross-correlation function:"
+    print "time shift = {0:.2f}\n".format(corrshift)
+    print 'Results from the simulated distribution:\n'
     print '{0} Simulations'.format(nsimulations)
     print 'time shift = {0:.2f} +- {1:.2f}'.format(shift, sigma)
-    print "============================= END ================================="
+    print "\n=========================== END ================================="
 
 #   open file to write results of the correlation function
     out = open('crosscorr.dat', 'w')
@@ -390,7 +387,6 @@ if __name__ == "__main__":
 
 #   plot original time series 1 plus shifted time series 2
     plt.errorbar(t, x, yerr=xe, label='series 1')
-    #plt.plot(t, y, label='series 2')
     plt.plot(newt, y, 'r', label='shifted series 2')
     plt.xlabel('Time [s]', fontsize=12)
     plt.ylabel('Normalized Count Rate [counts/s]', fontsize=12)
