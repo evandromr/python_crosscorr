@@ -200,12 +200,9 @@ if __name__ == "__main__":
     print 'results from the selected distribution'
     print 'time shift = {0:.2f} +- {1:.2f}'.format(shift, sigma)
 
-#   open file to write the cross correlation function
-    out = open('crosscorr.dat', 'w')
-#   write offset and corr to file 'crosscorr.dat' in 2 columns
-    for i in xrange(len(corr)):
-        out.write('{0} {1} \n'.format(offset[i], corr[i]))
-    out.close()
+    #aheader = 'Correlacao entre as curvas 1 e 2 \n'
+    #np.savetxt('crosscorr.dat.gz', np.transpose([offset, corr]),
+    #            delimiter=' ', header=aheader, comments='#')
 
 #   plot correlation function
     plt.plot(offset, corr, 'o-')
