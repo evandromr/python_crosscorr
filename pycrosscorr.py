@@ -83,8 +83,15 @@ if __name__ == "__main__":
     inpt1 = str(raw_input("File 1: "))
     inpt2 = str(raw_input("File 2: "))
 
-    tb1 = table.Table.read(inpt1, format=fmt)
-    tb2 = table.Table.read(inpt2, format=fmt)
+#    tb1 = table.Table.read(inpt1, format=fmt, hdu=1)
+#    tb2 = table.Table.read(inpt2, format=fmt, hdu=1)
+    
+    if fmt=='fits':
+        tb1 = table.Table.read(inpt1, format=fmt, hdu=1)
+        tb2 = table.Table.read(inpt2, format=fmt, hdu=1)
+    if fmt=='ascii':
+        tb1 = table.Table.read(inpt1, format=fmt)
+        tb2 = table.Table.read(inpt2, format=fmt)
 
     timecol = raw_input("Time column name or position (starting from zero): ")
     xcol = raw_input("series 1 column name or position (starting from zero): ")
@@ -192,6 +199,14 @@ if __name__ == "__main__":
 #======= DEBUG OPTIONS, comment if not necessary ==============================
 #   plot the distribution of a single point to check if it follows a normal
 #   distribution
+    aheader = 'dispersao dos pontos falsos para um ponto da curva de luz 1 \n'
+    np.savetxt('pointspread1.dat', aux1[len(t)/2],
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'dispersao dos pontos falsos para um ponto da curva de luz 2 \n'
+    np.savetxt('pointspread2.dat', aux2[len(t)/2],
+                delimiter=' ', header=aheader, comments='#')
+
     plt.hist(aux1[len(t)/2], label='mid point of curve 1', alpha=0.5)
     plt.hist(aux2[len(t)/2], label='mid point of curve 2', alpha=0.5)
     plt.title('Point spread distribution')
@@ -199,6 +214,18 @@ if __name__ == "__main__":
     plt.savefig('pointspread.ps')
     plt.show()
     plt.cla()
+
+    aheader = 'Todas as curvas de luz falsas do grupo A \n'
+    np.savetxt('fakecurves1.dat', np.array(newxses).T,
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'Todas as curvas de luz falsas do grupo B \n'
+    np.savetxt('fakecurves2.dat', np.array(newxses).T,
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'coluna de tempo para plotar com as curvas dos arquivos "fakecurves" \n'
+    np.savetxt('time.dat', t,
+                delimiter=' ', header=aheader, comments='#')
 
 #   plot all fake points and original curve on top to check
     for simulated in newxses:
@@ -210,13 +237,13 @@ if __name__ == "__main__":
     plt.cla()
 
 #   plot 10 new x lightcurves and original on top to check
-    for simulated in newxses[:10]:
-       plt.plot(t, simulated, '.-', alpha=0.5)
-    plt.errorbar(t, x, yerr=xe, fmt='k+-', linewidth=2.0, alpha=0.7)
-    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
-    plt.savefig('10_x_lightcurves.ps')
-    plt.show()
-    plt.cla()
+#    for simulated in newxses[:10]:
+#       plt.plot(t, simulated, '.-', alpha=0.5)
+#    plt.errorbar(t, x, yerr=xe, fmt='k+-', linewidth=2.0, alpha=0.7)
+#    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
+#    plt.savefig('10_x_lightcurves.ps')
+#    plt.show()
+#    plt.cla()
 
 #   plot new y lightcurves and original on top to check
     for simulated in newyses:
@@ -228,13 +255,13 @@ if __name__ == "__main__":
     plt.cla()
 
 #   plot 10 new y lightcurves and original on top to check
-    for simulated in newyses[:10]:
-        plt.plot(t, simulated, '.-', alpha=0.5)
-    plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0, alpha=0.7)
-    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
-    plt.savefig('10_y_lightcurves.ps')
-    plt.show()
-    plt.cla()
+#    for simulated in newyses[:10]:
+#        plt.plot(t, simulated, '.-', alpha=0.5)
+#    plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0, alpha=0.7)
+#    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
+#    plt.savefig('10_y_lightcurves.ps')
+#    plt.show()
+#    plt.cla()
 #==============================================================================
 
 #====== Statistical adjust of the simulations results =========================
@@ -250,7 +277,14 @@ if __name__ == "__main__":
         corrs.append(newcorr)
         offsets.append(newoffset)
 
-### DEBUG OPTION: plot all correlation functions (comment to ignore)
+    aheader = 'Todas as correlacoes entre os grupos A e B \n'
+    np.savetxt('allcorrelations.dat.gz', np.array(corrs).T,
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'Offsets correspondentes para as correlacoes entre A e B \n'
+    np.savetxt('alloffsets.dat.gz', np.array(offsets).T,
+                delimiter=' ', header=aheader, comments='#')
+
     for correlation, offset in zip(corrs, offsets):
         plt.plot(offset, correlation, alpha=0.6)
     plt.xlabel('Offset [s]')
@@ -267,6 +301,10 @@ if __name__ == "__main__":
 
 #   a smaller bin size to check small flutuations of the distribution
     binlist2 = np.arange(-max(t), max(t), step=stp/10)
+
+    aheader = 'Delays de todas as correlacoes entre os grups A e B \n'
+    np.savetxt('alldelays.dat.gz', np.array(shiftes).T,
+                delimiter=' ', header=aheader, comments='#')
 
 #   plot original time shift distribution
     plt.hist(shiftes, bins=binlist, alpha=0.7)
@@ -355,12 +393,17 @@ if __name__ == "__main__":
     print 'time shift = {0:.2f} +- {1:.2f}'.format(shift, sigma)
     print "\n=========================== END ================================="
 
+
+    aheader = 'Correlacao entre as curvas 1 e 2 \n'
+    np.savetxt('crosscorr.dat.gz', np.transpose([offset, corr]),
+                delimiter=' ', header=aheader, comments='#')
+
 #   open file to write results of the correlation function
-    out = open('crosscorr.dat', 'w')
+#    out = open('crosscorr.dat', 'w')
 #   write offset and corr to file 'crosscorr.dat' in 2 columns
-    for i in xrange(len(corr)):
-        out.write('{0} {1} \n'.format(offset[i], corr[i]))
-    out.close()
+#    for i in xrange(len(corr)):
+#        out.write('{0} {1} \n'.format(offset[i], corr[i]))
+#    out.close()
 
 #   plot correlation function
     plt.plot(offset, corr, 'o-')
