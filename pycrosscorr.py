@@ -83,8 +83,15 @@ if __name__ == "__main__":
     inpt1 = str(raw_input("File 1: "))
     inpt2 = str(raw_input("File 2: "))
 
-    tb1 = table.Table.read(inpt1, format=fmt)
-    tb2 = table.Table.read(inpt2, format=fmt)
+#    tb1 = table.Table.read(inpt1, format=fmt, hdu=1)
+#    tb2 = table.Table.read(inpt2, format=fmt, hdu=1)
+    
+    if fmt=='fits':
+        tb1 = table.Table.read(inpt1, format=fmt, hdu=1)
+        tb2 = table.Table.read(inpt2, format=fmt, hdu=1)
+    if fmt=='ascii':
+        tb1 = table.Table.read(inpt1, format=fmt)
+        tb2 = table.Table.read(inpt2, format=fmt)
 
     timecol = raw_input("Time column name or position (starting from zero): ")
     xcol = raw_input("series 1 column name or position (starting from zero): ")
@@ -192,49 +199,74 @@ if __name__ == "__main__":
 #======= DEBUG OPTIONS, comment if not necessary ==============================
 #   plot the distribution of a single point to check if it follows a normal
 #   distribution
+    aheader = 'dispersao dos pontos falsos para um ponto da curva de luz 1 \n'
+    np.savetxt('pointspread1.dat.gz', aux1[len(t)/2],
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'dispersao dos pontos falsos para um ponto da curva de luz 2 \n'
+    np.savetxt('pointspread2.dat.gz', aux2[len(t)/2],
+                delimiter=' ', header=aheader, comments='#')
+
     plt.hist(aux1[len(t)/2], label='mid point of curve 1', alpha=0.5)
     plt.hist(aux2[len(t)/2], label='mid point of curve 2', alpha=0.5)
     plt.title('Point spread distribution')
     plt.legend(loc='best')
-    plt.savefig('pointspread.ps')
+    plt.savefig('pointspread.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
+
+    aheader = 'Todas as curvas de luz falsas do grupo A \n'
+    np.savetxt('fakecurves1.dat.gz', np.array(newxses).T,
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'Todas as curvas de luz falsas do grupo B \n'
+    np.savetxt('fakecurves2.dat.gz', np.array(newxses).T,
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'coluna de tempo para plotar com as curvas dos arquivos "fakecurves" \n'
+    np.savetxt('time.dat.gz', t,
+                delimiter=' ', header=aheader, comments='#')
 
 #   plot all fake points and original curve on top to check
     for simulated in newxses:
        plt.plot(t, simulated, '.', alpha=0.6)
     plt.errorbar(t, x, yerr=xe, fmt='k+-', linewidth=2.0)
     plt.title("Colored: randomized points, Black: Original lightcurve")
-    plt.savefig('fake_x_lightcurves.ps')
+    plt.savefig('fake_x_lightcurves.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
 #   plot 10 new x lightcurves and original on top to check
-    for simulated in newxses[:10]:
-       plt.plot(t, simulated, '.-', alpha=0.5)
-    plt.errorbar(t, x, yerr=xe, fmt='k+-', linewidth=2.0, alpha=0.7)
-    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
-    plt.savefig('10_x_lightcurves.ps')
-    plt.show()
-    plt.cla()
+#    for simulated in newxses[:10]:
+#       plt.plot(t, simulated, '.-', alpha=0.5)
+#    plt.errorbar(t, x, yerr=xe, fmt='k+-', linewidth=2.0, alpha=0.7)
+#    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
+#    plt.savefig('10_x_lightcurves.pdf', bbox_inches='tight', format='pdf',
+#            papertype='a4', orientation='landscape')
+#    plt.show()
+#    plt.cla()
 
 #   plot new y lightcurves and original on top to check
     for simulated in newyses:
         plt.plot(t, simulated, '.', alpha=0.6)
     plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0)
     plt.title("Colored: randomized lightcurves, Black: Original lightcurve")
-    plt.savefig('fake_y_lightcurves.ps')
+    plt.savefig('fake_y_lightcurves.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
 #   plot 10 new y lightcurves and original on top to check
-    for simulated in newyses[:10]:
-        plt.plot(t, simulated, '.-', alpha=0.5)
-    plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0, alpha=0.7)
-    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
-    plt.savefig('10_y_lightcurves.ps')
-    plt.show()
-    plt.cla()
+#    for simulated in newyses[:10]:
+#        plt.plot(t, simulated, '.-', alpha=0.5)
+#    plt.errorbar(t, y, yerr=ye, fmt='k+-', linewidth=2.0, alpha=0.7)
+#    plt.title("Colored: 10 randomized lightcurves, Black: Original lightcurve")
+#    plt.savefig('10_y_lightcurves.pdf', bbox_inches='tight', format='pdf',
+#            papertype='a4', orientation='landscape')
+#    plt.show()
+#    plt.cla()
 #==============================================================================
 
 #====== Statistical adjust of the simulations results =========================
@@ -250,12 +282,20 @@ if __name__ == "__main__":
         corrs.append(newcorr)
         offsets.append(newoffset)
 
-### DEBUG OPTION: plot all correlation functions (comment to ignore)
+    aheader = 'Todas as correlacoes entre os grupos A e B \n'
+    np.savetxt('allcorrelations.dat.gz', np.array(corrs).T,
+                delimiter=' ', header=aheader, comments='#')
+
+    aheader = 'Offsets correspondentes para as correlacoes entre A e B \n'
+    np.savetxt('alloffsets.dat.gz', np.array(offsets).T,
+                delimiter=' ', header=aheader, comments='#')
+
     for correlation, offset in zip(corrs, offsets):
         plt.plot(offset, correlation, alpha=0.6)
     plt.xlabel('Offset [s]')
     plt.ylabel('Correlation')
-    plt.savefig('correlations.ps')
+    plt.savefig('correlations.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
@@ -268,11 +308,16 @@ if __name__ == "__main__":
 #   a smaller bin size to check small flutuations of the distribution
     binlist2 = np.arange(-max(t), max(t), step=stp/10)
 
+    aheader = 'Delays de todas as correlacoes entre os grups A e B \n'
+    np.savetxt('alldelays.dat.gz', np.array(shiftes).T,
+                delimiter=' ', header=aheader, comments='#')
+
 #   plot original time shift distribution
     plt.hist(shiftes, bins=binlist, alpha=0.7)
     plt.hist(shiftes, bins=binlist2, alpha=0.5)
     plt.title('Distribution Function')
-    plt.savefig('distribution_full.ps')
+    plt.savefig('distribution_full.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
@@ -302,7 +347,8 @@ if __name__ == "__main__":
             label='mean={0:.2f}, sigma={1:.2f}'.format(mean,sigma))
     plt.title('Selected Distribution Function')
     plt.legend(loc='best')
-    plt.savefig('distribution_adjusted.ps')
+    plt.savefig('distribution_adjusted.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
@@ -355,12 +401,10 @@ if __name__ == "__main__":
     print 'time shift = {0:.2f} +- {1:.2f}'.format(shift, sigma)
     print "\n=========================== END ================================="
 
-#   open file to write results of the correlation function
-    out = open('crosscorr.dat', 'w')
-#   write offset and corr to file 'crosscorr.dat' in 2 columns
-    for i in xrange(len(corr)):
-        out.write('{0} {1} \n'.format(offset[i], corr[i]))
-    out.close()
+
+    aheader = 'Correlacao entre as curvas 1 e 2 \n'
+    np.savetxt('crosscorr.dat.gz', np.transpose([offset, corr]),
+                delimiter=' ', header=aheader, comments='#')
 
 #   plot correlation function
     plt.plot(offset, corr, 'o-')
@@ -371,7 +415,8 @@ if __name__ == "__main__":
     plt.ylabel('Correlation coeficient', fontsize=12)
     plt.title('Correlation Function')
     plt.legend(loc='best')
-    plt.savefig('crosscorr.ps')
+    plt.savefig('crosscorr.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
@@ -381,7 +426,8 @@ if __name__ == "__main__":
     plt.xlabel('Time [s]', fontsize=12)
     plt.ylabel('Normalized Count Rate [counts/s]', fontsize=12)
     plt.legend(loc='best')
-    plt.savefig('lightcurves.ps')
+    plt.savefig('lightcurves.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
 
@@ -391,6 +437,7 @@ if __name__ == "__main__":
     plt.xlabel('Time [s]', fontsize=12)
     plt.ylabel('Normalized Count Rate [counts/s]', fontsize=12)
     plt.legend(loc='best')
-    plt.savefig('new_lightcurves.ps')
+    plt.savefig('new_lightcurves.pdf', bbox_inches='tight', format='pdf',
+            papertype='a4', orientation='landscape')
     plt.show()
     plt.cla()
