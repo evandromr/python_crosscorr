@@ -282,21 +282,24 @@ if __name__ == "__main__":
         corrs.append(newcorr)
         offsets.append(newoffset)
 
-    aheader = 'Todas as correlacoes entre os grupos A e B \n'
+    corrs = corrs[::-1]
+    corrs.append(newoffset)
+    corrs = corrs[::-1]
+
+    aheader = '''Todas as correlacoes entre os grupos A e B \n
+                 - primeira coluna = delays, demais colunas = correlacao\n'''
     np.savetxt('allcorrelations.dat.gz', np.array(corrs).T,
                 delimiter=' ', header=aheader, comments='#')
 
-    aheader = 'Offsets correspondentes para as correlacoes entre A e B \n'
-    np.savetxt('alloffsets.dat.gz', np.array(offsets).T,
-                delimiter=' ', header=aheader, comments='#')
-
-    for correlation, offset in zip(corrs, offsets):
+    for correlation, offset in zip(corrs[1:], offsets):
         plt.plot(offset, correlation, alpha=0.6)
     plt.xlabel('Offset [s]')
     plt.ylabel('Correlation')
     plt.savefig('correlations.pdf', bbox_inches='tight', format='pdf',
             papertype='a4', orientation='landscape')
-    plt.show()
+    query = str(raw_input('Plotar todas as correlacoes? (y/n): '))
+    if query == 'y':
+        plt.show()
     plt.cla()
 
 #   calculates the natural binning of the lightcurve
