@@ -24,9 +24,12 @@ def crosscorr(x, y, t):
     corr = signal.correlate(x,y)/float(len(x))
 
     # transform time axis in offset units
-    lags = np.arange(corr.size) - (t.size - 1)
-    tstep = (t[-1] - t[0])/float(t.size)
-    offset = lags*tstep
+    #lags = np.arange(corr.size) - (t.size - 1)
+    #tstep = (t[-1] - t[0])/float(t.size)
+    #offset = lags*tstep
+    tstep = t[1]-t[0]
+    inc = tstep/3.0
+    offset = np.arange(-max(t), max(t)+inc, tstep)
 
     # time shift is found for the maximum of the correlation function
     shift = offset[np.argmax(corr)]
